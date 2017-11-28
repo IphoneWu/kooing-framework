@@ -34,14 +34,25 @@
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
 
+        <!-- 启动 -->
+        <guava.version>15.0</guava.version>
+
+        <!-- zookeeper -->
+        <zookeeper.version>3.4.5</zookeeper.version>
+        <zkClient.version>0.3</zkClient.version>
+
         <!-- db -->
-        <mybatis.version>3.2.8</mybatis.version>
-        <mybatis.spring.version>1.2.1</mybatis.spring.version>
+        <mybatis.version>3.4.4</mybatis.version>
+        <mybatis.spring.version>1.3.1</mybatis.spring.version>
         <mysql.connector.version>5.1.34</mysql.connector.version>
         <druid.version>1.0.6</druid.version>
 
         <!-- lombok -->
         <lombok.version>1.14.8</lombok.version>
+
+        <!-- validator -->
+        <validation-api.version>1.1.0.Final</validation-api.version>
+        <hibernate-validator.version>5.3.0.Alpha1</hibernate-validator.version>
 
         <!-- spring -->
         <springframework.version>4.0.0.RELEASE</springframework.version>
@@ -57,9 +68,11 @@
         <jstl.version>1.2</jstl.version>
 
         <!-- log -->
-        <slf4j.version>1.7.5</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>2.4.1</log4j.version>
         <logback.version>1.0.7</logback.version>
+        <log4j-slf4j.version>2.4.1</log4j-slf4j.version>
+        <log4j-jcl.version>2.2</log4j-jcl.version>
 
         <log4jdbc-log4j2-jdbc4.1.version>1.15</log4jdbc-log4j2-jdbc4.1.version>
         <log4jdbc-log4j2-jdbc4.version>1.15</log4jdbc-log4j2-jdbc4.version>
@@ -68,13 +81,97 @@
         <!-- json -->
         <jackson.version>1.9.12</jackson.version>
 
+        <!--fastjson-->
+        <fastjson.version>1.2.38</fastjson.version>
+
         <!-- dubbo -->
-        <dubbo.version>2.8.3</dubbo.version>
+        <dubbo.version>2.8.4</dubbo.version>
 
         <jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
+
+        <!--mybatis分页插件-->
+        <pagehelper.version>5.1.2</pagehelper.version>
+
     </properties>
     <dependencyManagement>
+
         <dependencies>
+            <!--mybatis分页插件-->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+
+            <!--fastjson-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!--dubbo输出对象自动转json-->
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jackson-provider</artifactId>
+                <version>${jboss.resteasy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency> <!-- 桥接：告诉Slf4j使用Log4j2 -->
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j-slf4j.version}</version>
+            </dependency>
+
+            <dependency> <!-- 桥接：告诉commons logging使用Log4j2 -->
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jcl</artifactId>
+                <version>${log4j-jcl.version}</version>
+            </dependency>
+
+            <!-- 注册中心zookeeper begin -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- 注册中心zookeeper end -->
+            <!-- zookeeper -->
+
+            <dependency>
+                <groupId>com.101tec</groupId>
+                <artifactId>zkclient</artifactId>
+                <scope>compile</scope>
+                <version>${zkClient.version}</version>
+            </dependency>
             <!-- mybatis start -->
             <dependency>
                 <groupId>org.mybatis</groupId>
@@ -117,6 +214,12 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${springframework.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -215,36 +318,7 @@
                 <version>${spring.redis.version}</version>
             </dependency>
 
-            <!-- Logging -->
-            <!-- slf4j -->
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <!-- slf4j-log4j绑定 -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <!-- common-logging to slf4j -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <!-- log4j -->
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
+
             <!-- dubbo rest -->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -272,6 +346,10 @@
                         <artifactId>spring</artifactId>
                         <groupId>org.springframework</groupId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -292,6 +370,91 @@
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.0.1</version>
             </dependency>
+
+            <!-- 如果要使用Sun HTTP server -->
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jdk-http</artifactId>
+                <version>${jboss.resteasy.version}</version>
+            </dependency>
+            <!-- jetty -->
+            <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty</artifactId>
+                <version>7.0.0.pre5</version>
+            </dependency>
+
+
+            <!-- 如果要使用tomcat server -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>8.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-logging-juli</artifactId>
+                <version>8.0.11</version>
+            </dependency>
+
+            <!-- 启动 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.18.2-GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>3.2.5.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
+            </dependency>
+
+            <!-- netty通信框架 -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.0.24.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>3.7.0.Final</version>
+            </dependency>
+
+            <!-- 如果要使用netty server -->
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-netty</artifactId>
+                <version>${jboss.resteasy.version}</version>
+            </dependency>
+
+            <!-- JSR 303 with Hibernate Validator -->
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${validation-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.4.1</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>
@@ -341,7 +504,7 @@
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.2</version>
+                <version>1.3.5</version>
                 <configuration>
                     <verbose>true</verbose>
                     <overwrite>true</overwrite>
@@ -355,5 +518,6 @@
         </plugins>
 
     </build>
+
 
 </project>
